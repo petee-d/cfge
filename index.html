@@ -1,0 +1,384 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Context-Free Grammar Explorer</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="css/main.css?23" />
+    <link rel="stylesheet" href="css/symbols.css?23" />
+    <link rel="stylesheet" href="css/structures.css?23" />
+    <link rel="stylesheet" href="css/tabs.css?23" />
+    
+    <script src="js/common.js?23"></script>
+    <script src="js/MyError.js?23"></script>
+    <script src="js/Loader.js?23"></script>
+    <script src="js/Highlight.js?23"></script>
+
+    <script src="js/external/plugins.js?23"></script>
+    <script src="js/external/lz-string-1.3.3.js"></script>
+    <script src="js/external/d3.v3.min.js"></script>
+    <script src="js/external/dagre-d3.min.js"></script>
+    <script src="js/external/viz.js"></script>
+
+    <script src="js/structures/Symbol.js?23"></script>
+    <script src="js/structures/Word.js?23"></script>
+    <script src="js/structures/Rule.js?23"></script>
+    <script src="js/structures/Grammar.js?23"></script>
+    <script src="js/structures/ConversionGrammar.js?23"></script>
+    
+    <script src="js/structures/Structures.js?23"></script>
+    <script src="js/structures/LRItem.js?23"></script>
+    <script src="js/structures/LRState.js?23"></script>
+    <script src="js/structures/LRAutomaton.js?23"></script>
+    <script src="js/structures/ParserActions.js?23"></script>
+    <script src="js/structures/ParserStructures.js?23"></script>
+
+    <script src="js/algorithm_framework/AlgorithmController.js?23"></script>
+    <script src="js/algorithm_framework/AlgorithmExplorer.js?23"></script>
+
+    <script src="js/grammar_forms/ReducedForm.js?23"></script>
+    <script src="js/grammar_forms/EpsilonFreeForm.js?23"></script>
+    <script src="js/grammar_forms/ChainRuleFreeForm.js?23"></script>
+    <script src="js/grammar_forms/ChomskyForm.js?23"></script>
+    <script src="js/grammar_forms/StrictChomskyForm.js?23"></script>
+    <script src="js/grammar_forms/GreibachForm.js?23"></script>
+    <script src="js/grammar_forms/NoLeftRecursionForm.js?23"></script>
+    <script src="js/grammar_forms/LeftFactoredForm.js?23"></script>
+    <script src="js/grammar_forms/FrameworkDemoForm.js?23"></script>
+    
+    <script src="js/parsing/CYK.js?23"></script>
+    <script src="js/parsing/CYKParseTree.js?23"></script>
+    <script src="js/parsing/FirstFollowCompute.js?23"></script>
+    <script src="js/parsing/SLRParseTableCompute.js?23"></script>
+    <script src="js/parsing/CLRParseTableCompute.js?23"></script>
+    <script src="js/parsing/LALRParseTableCompute.js?23"></script>
+    <script src="js/parsing/LRParserAlgorithm.js?23"></script>
+    <script src="js/parsing/LLParseTableCompute.js?23"></script>
+    <script src="js/parsing/LLParserAlgorithm.js?23"></script>
+    
+    <script src="js/gui/visualComponents.js?23"></script>
+    <script src="js/gui/Menu.js?23"></script>
+    <script src="js/gui/MainTab.js?23"></script>
+    <script src="js/gui/RichInput.js?23"></script>
+    <script src="js/gui/TextInput.js?23"></script>
+    <script src="js/gui/ParseTableInput.js?23"></script>
+
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-44071587-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+
+    </script>
+</head>
+
+
+<body>
+    <div id="page">
+        <header>
+            <div id="nav_minimize_overlay"></div>
+            <nav>
+                <div>
+                    <div>
+                        <div id="menu_MainTab">
+                            <div>
+                                <div id="logo">
+                                    <div><span>C</span><div>ontext-</div><span>F</span><div>ree</div></div>
+                                    <div><span>G</span><div>rammar </div><span>E</span><div>xplorer</div></div>
+                                </div>
+                                <div id="footer">
+                                    <a href="http://code.google.com/p/context-free-grammar-explorer/">made by Petee</a>,
+                                <span title="Copyleft">&copy;</span> 2013-14
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div>
+                                <span>input / output</span>
+                                <ul>
+                                    <li id="menu_RichInput">grammar (rich)</li>
+                                    <li id="menu_TextInput">grammar (text)</li>
+                                    <li id="menu_ParseTableInput">parse table</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div>
+                            <div>
+                                <span>normal forms</span>
+                                <ul id="menu_normal_forms">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div>
+                            <div>
+                                <span>word parsing</span>
+                                <ul id="menu_parsing">
+                                    <li id="menu_CYKParseTree">CYK</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <div class="button" id="nav_minimize">Hide menu</div>
+        </header>
+
+
+        <div id="content">
+            <div id="original_grammar"><div></div></div>
+            <div id="notification_bar"><div></div></div>
+            <div id="tabs">
+
+                <div id="tab_MainTab">
+                    <h3>Welcome to Context-Free Grammar Explorer</h3>
+                    <p>Please start by chosing one of the grammar <b>input methods</b> in the menu. There is a handful of <b>grammar examples</b> located in the section for text input, meant to demonstrate the particular algorithms. You can even store a grammar in a HTTP link and share it with others.</p>
+                    <p>Input format:</p>
+                    <ul>
+                        <li><b>Symbols</b> (terminals and nonterminals) are words over the <b>ASCII letters (<i>a-z</i>, <i>A-Z</i>), digits (<i>0-9</i>), some special characters ( <i>~ ! @ # * ( ) _ + ' ; : ?</i> )</b>, with <b>no whitespaces</b>.
+                            <ul>
+                                <li><b>Terminals</b> start with a <b>lowercase letter, digit or a special character</b>, <b>nonterminals</b> start with an <b>uppercase letter (<i>A-Z</i>)</b>.</li>
+                                <li>They can optionally be <b>indexed</b> by appending the <b>forward slash character ( <i>/</i> )</b> and a non-empty word over the alphabet.</li>
+                            </ul>
+                        </li>
+                        <li><b>Words</b> consist of terminals/nonterminals, each <b>separated</b> by at least one <b>space character</b>; alternatively <b><code>eps</code> for empty word</b></li>
+                    </ul>
+                    <p>You can immediatelly see <b>which normal forms</b> your grammar <b>conforms to</b> (plus whether the grammar is regular). After you choose a normal form in the menu, your grammar will be <b>converted to it, visualizing the process</b>.</p>
+                    <ul>
+                        <li>Use the buttons to navigate through the conversion process. There are buttons to:
+                            <ul>
+                                <li>see the <b>next/previous step</b></li>
+                                <li>proceed to the next/previous task, <b>skipping substeps</b></li>
+                                <li>go to the <b>end/beginning</b></li>
+                            </ul>
+                        </li>
+                        <li>You can either <b>save the final grammar state, any of the intermediate steps</b>, or discard the changes entirely by leaving the section</li>
+                    </ul>
+                    <p>If your grammar is in strict Chomsky normal form (or you use the tool to convert to it), you can use the <b>CYK algorithm</b> to <b>parse any word</b> over the terminal alphabet. If the word is produced by your grammar, the tool will display:</p>
+                    <ul>
+                        <li><b>the parse tree</b> (if multiple parse trees exist, you can go through them in random order)</li>
+                        <li>the <b>leftmost & rightmost derivation</b> for the displayed parse tree</li>
+                    </ul>
+                </div>
+
+                <div id="tab_RichInput">
+                    <div id="RI_container"></div>
+                </div>
+                
+                <div id="tab_ParseTableInput">
+                    <div id="PTI_container"></div>
+                </div>
+
+                <div id="tab_TextInput">
+
+                    <a class="button active" id="TI_friendly">Math-like</a>
+                    <a class="button" id="TI_CFGC">ucalgary.ca</a>
+                    <a class="button" id="TI_JSON">JSON</a>
+                    <a class="button" id="TI_link">HTTP link</a>
+                    <textarea id="TI_textarea"></textarea>
+                    <a class="button" id="TI_save">Save</a>
+                    <h2>Useful grammar examples:</h2>
+                    <ul id="TI_examples">
+                        <li class="template"><a href="#">name</a> - <span>description</span></li>
+                    </ul>
+
+                </div>
+
+                <div id="tab_Algorithm">
+
+                    <div id="algorithm_setup">
+                        <div id="algorithm_progress"></div>
+                    </div>
+                    <div id="algorithm_container"></div>
+
+                </div>
+
+                <div id="tab_CYKParseTree">
+                    <p id="PT_notInChomsky">
+                        The CYK algorithm used to parse the input requires a grammar in strict Chomsky normal form. Please modify the grammar yourself or convert it automatically using the option in menu.
+                    </p>
+                    <p id="PT_first">Input word:
+                        <input id="PT_input" />
+                        <a class="button" id="PT_execute">Parse with CYK</a>
+                    </p>
+                    <p id="PT_progress">CYK parsing in progress...
+                        <span>
+                            <span id="PT_progessbar"></span>
+                            <span></span>
+                        </span>
+                    </p>
+                    <p id="PT_result">
+                        The input word 
+                        <span id="PT_inputRich"></span>
+                        <span id="PT_success">is generated</span>
+                        <span id="PT_failure">is not generated</span>
+                        by this grammar.
+                        <a class="button" id="PT_anotherCYKParseTree">Display random parse tree</a>
+                    </p>
+                    <div id="PT_tree"></div>
+                    <div id="PT_leftmostDerivation">
+                        <p>Leftmost derivation: </p>
+                        <div></div>
+                    </div>
+                    <div id="PT_rightmostDerivation">
+                        <p>Rightmost derivation: </p>
+                        <div></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="toolbox">
+        <div id="algorithm_toolbox">
+            <div id="algorithm_tools">
+                <ul id="algorithm_arrows">
+                    <li id="algorithm_goStart"></li>
+                    <li id="algorithm_goPrev"></li>
+                    <li id="algorithm_goBackward"></li>
+                    <li id="algorithm_goForward"></li>
+                    <li id="algorithm_goNext"></li>
+                    <li id="algorithm_goEnd"></li>
+                </ul>
+                <h2 id="algorithm_name"></h2>
+                <table id="algorithm_table">
+                </table>
+                <a class="button" id="algorithm_save_result">Save final result and return to input</a>
+                <a class="button" id="algorithm_save_current">Save current state and return to input</a>
+            </div>
+            <div id="algorithm_steps">
+                <select size="2"></select>
+            </div>
+        </div>
+
+        <div id="other_toolbox">
+            <h2>Options:</h2>
+            <p>
+                <span>Graph renderer:</span>
+                <select id="option_graph_renderer">
+                    <option value="none">None</option>
+                    <option value="dagre">dagre-d3 (fast)</option>
+                    <option value="graphviz">Viz.js/Graphviz (slow, better layout)</option>
+                </select>
+            </p>
+            <p>
+                <span>Graph direction:</span>
+                <select id="option_graph_direction">
+                    <option value="TB">top-bottom</option>
+                    <option value="LR">left-to-right</option>
+                </select>
+            </p>
+        </div>
+    </div>
+
+
+    <div id="templates">
+
+        <div id="grammar_template" class="template">
+            <div class="grammar">
+                <div class="set_box tuple_box">
+                    <div class="set_map">
+                        <div>
+                            <span class="set_mapping" title="Nonterminals - use uppercase letters">
+                                <span class="syntax">N</span>
+                                <span class="syntax">=</span>
+                            </span>
+                            <div>
+                                <div class="set_box">
+                                    <div class="set_list nonterminals">
+                                    </div>
+                                </div><!--<span class="syntax comma">,</span>-->
+                            </div>
+                        </div>
+                        <div>
+                            <span class="set_mapping" title="Terminals - use lowercase letters">
+                                <span class="syntax">T</span>
+                                <span class="syntax">=</span>
+                            </span>
+                            <div>
+                                <div class="set_box">
+                                    <div class="set_list terminals">
+                                    </div>
+                                </div><!--<span class="syntax comma">,</span>-->
+                            </div>
+                        </div>
+                        <div>
+                            <span class="set_mapping" title="Rules - use a single nonterminal on the left side and any word on the right side">
+                                <span class="syntax">P</span>
+                                <span class="syntax">=</span>
+                            </span>
+                            <div>
+                                <div class="set_box">
+                                    <div class="set_map rules">
+                                    </div>
+                                </div><!--<span class="syntax comma">,</span>-->
+                            </div>
+                        </div>
+                        <div>
+                            <span class="set_mapping" title="Starting nonterminal">
+                                <span class="syntax">S</span>
+                                <span class="syntax">=</span>
+                            </span>
+                            <div class="set_list starting_nonterminal"><span class="nonterminal"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="rule_template" class="template">
+            <div class="rule">
+                <span class="set_mapping">
+                    <span class="nonterminal"></span>
+                    <span class="syntax">&rarr;</span>
+                </span>
+                <div>
+                    <div class="set_list">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="set_structure_template" class="template">
+            <div class="set_map structure">
+                <div>
+                    <span class="set_mapping">
+                        <span class="syntax">=</span>
+                    </span>
+                    <div>
+                        <div class="set_box">
+                            <div class="set_list">
+                            </div>
+                        </div><!--<span class="syntax comma">,</span>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="scratchpad"></div>
+
+    </div>
+
+    <!-- <div id="page_top"><div id="grammar_evaluation"></div><div id="button_original_grammar">show original grammar</div></div> -->
+    <div id="error_log" style="display: none">
+        <div></div>
+        <textarea></textarea>
+    </div>
+    
+    <script type="text/javascript">
+        Loader();
+    </script>
+</body>
+</html>

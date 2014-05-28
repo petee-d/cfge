@@ -1,0 +1,72 @@
+﻿.terminal, .nonterminal {
+    margin-left: -1px;
+    margin-right: 1px;
+    padding-right: 1px;
+    z-index: 10;
+}
+
+.terminal {
+    font-family: Tahoma, Geneva, sans-serif;
+    font-style: italic;
+    font-weight: normal;
+}
+
+.nonterminal {
+    font-family: Tahoma, Geneva, sans-serif;
+    font-style: italic;
+    font-weight: bold;
+}
+
+.epsilon {
+    font-family: Tahoma, Geneva, sans-serif;
+    font-style: italic;
+}
+
+sub {
+    font-size: small;
+    vertical-align: -4px;
+}
+
+
+/* highlights */
+
+.hl-removed {
+    color: rgb(206, 8, 8);
+    text-decoration: line-through;
+}
+
+.hl-attention {
+    color: blue;
+    text-decoration: underline;
+}
+.hl-attention-old {
+    color: darkblue;
+    text-decoration: underline;
+}
+
+.hl-special {
+    text-shadow: 0 0 8px #222;
+}
+
+.hl-new {
+    color: rgb(69, 177, 64);
+    text-decoration: underline;
+}
+.hl-duplicate {
+    color: rgb(62, 119, 60);
+}
+.hl-replaced {
+    color: rgb(163, 122, 61);
+    text-decoration: underline;
+}
+
+/* ensure some word highlights override symbol highlights */
+
+.word.hl-removed > span {
+    color: rgb(206, 8, 8);
+    text-decoration: line-through;
+}
+
+.math {
+    display: inline;
+}

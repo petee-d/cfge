@@ -1,0 +1,75 @@
+﻿#TI_textarea {
+    width: 99%;
+    display: block;
+    resize: vertical;
+    min-height: 200px;
+}
+
+
+#algorithm_setup {
+}
+#algorithm_progress {
+    text-align: left;
+    margin: 50px 0 0 25px;
+}
+
+#algorithm_container {
+    margin: 0 0 0 0;
+}
+
+
+
+#PT_notInChomsky {
+    font-weight: bold;
+}
+
+#PT_input {
+    margin: 1px 20px;
+    width: 50%;
+    height: 25px;
+    vertical-align: 1px;
+    font-size: 25px;
+    font-style: italic;
+}
+#PT_inputRich {
+    font-size: 23px;
+    font-family: Tahoma, Geneva, sans-serif;
+    text-align: left;
+    margin: 0 6px 0 2px;
+}
+#PT_execute, #PT_anotherCYKParseTree {
+    float: right;
+}
+#PT_success {
+    font-weight: bold;
+    color: darkgreen;
+}
+#PT_failure {
+    font-weight: bold;
+    color: darkred;
+}
+#PT_progress > span {
+    width: 50%;
+    display: inline-block;
+    text-align: left;
+    margin: 10px;
+    border: 2px outset white;
+    position: relative;
+    background: #ddd;
+    height: 25px;
+    vertical-align: middle;
+}
+#PT_progessbar {
+    width: 90%;
+    display: inline-block;
+    height: 25px;
+    background: rgb(128, 235, 128);
+}
+#PT_progessbar + span {
+    display: block;
+    position: absolute;
+    width: 100%;
+    top: 3px;
+    text-align: center;
+    font-weight: bold;
+}

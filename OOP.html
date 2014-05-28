@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>A tiny lesson of JavaScript object oriented programming put together by Petee</title>
+</head>
+<body>
+    <pre>
+        A tiny lesson of JavaScript object oriented programming together by Petee
+
+
+        A non-static class definition in this project will look like this:
+
+        1.)
+            var MyClass = function (arg1, arg2) {
+            
+                ...
+            
+                this.myProperty = "anything";
+                this.myOtherProperty = arg1;
+
+                ...    
+            }
+
+            This is how we can make the first definition of a "class" in JavaScript.
+            The function is in fact it's constructor.
+            JavaScript doesn't provide function overriding, so neither will it be possible to override constructors.
+            Any necessary overrides will be done in the body of the function.
+            Assigning object properties to the this reference is in fact initializing the properties of our class instances.
+
+        1.')
+            var obj = new MyClass("parameter1", "parameter2");
+
+            This is how we can later create instances of our classes;
+
+        2.)
+            MyClass.prototype.myMethod = function (arg1, arg2) {
+            
+                ...
+
+                this.myProperty = arg1;        
+
+                ...
+
+            }
+
+            This is how we define a non-static method.
+            The this keyword references to the instance and can be used to access properties and other methods.
+
+        2.')
+            var obj = new MyClass("parameter1", "parameter2");
+            obj.myMethod(1, 2);
+
+            And this is how we call a method.
+
+        3.)
+            MyClass.myStaticMethod = function (arg1, arg2) {
+                
+                ...
+
+                var obj = new this(arg2, arg1);
+
+                ...
+
+            }
+
+            This trick allows us to define static methods of non-static classes.
+            They are pretty much normal functions, but their this pointer references the class object.
+            Thus, it can even be used to make instances of that class.
+
+        3.')
+            MyClass.myStaticMethod(1, 2);
+
+            Calling a static method...            
+
+        4.)
+            INHERITANCE - TODO
+
+    </pre>
+</body>
+</html>
