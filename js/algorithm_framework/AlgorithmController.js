@@ -203,7 +203,7 @@ AlgorithmController.prototype.init = function (explorer) {
     var that = this, grammar = Current.grammar;
     // Algorithm Controller Tree root
     this._root = new ACTNode(function (c) {
-        c.task(function (c) { c.myNameIs(_("this is the initial state")) });
+        c.task(function (c) { c.myNameIs(_("this is the initial state of the algorithm")) });
         that.main(c);
     });
     // active ACTNode
@@ -343,7 +343,7 @@ AlgorithmController.prototype.finished = function () {
 function setupAlgorithmImplementation(AlgorithmClass, settings) {
     /// <summary>set up a new class for a visualized algorithm</summary>
     /// <param name="AlgorithmClass" type="Function">function object of the algorithm</param>
-    /// <param name="settings" type="Object">{ id: "NameOfTheClass", name: _("My new algorithm"), type: "MenuCategoryID", (optional) parent: BaseClassName }</param>
+    /// <param name="settings" type="Object">{ id: "NameOfTheClass", name: _("My new algorithm"), type: "MenuCategoryID", (optional) parent: BaseClassName, (optional) userParserInput: Boolean }</param>
 
     AlgorithmClass.prototype = new (settings.parent || AlgorithmController)();
 
@@ -365,8 +365,13 @@ function setupAlgorithmImplementation(AlgorithmClass, settings) {
     AlgorithmClass.getType = function () {
         return settings.type;
     };
+
+    var invoker = null;
+    if (settings.userParserInput)
+        invoker = AlgorithmExplorer.userParserInput;
+        
     AlgorithmClass.open = function () {
-        openAlgorithmExplorer(this);
+        openAlgorithmExplorer(this, invoker);
     };
 
     Loader.algorithmList.push(AlgorithmClass);

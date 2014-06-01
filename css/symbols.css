@@ -30,32 +30,38 @@ sub {
 
 /* highlights */
 
-.hl-removed {
+span.hl-removed {
     color: rgb(206, 8, 8);
     text-decoration: line-through;
 }
 
-.hl-attention {
+span.hl-attention {
     color: blue;
     text-decoration: underline;
 }
-.hl-attention-old {
+td.hl-attention {
+    background-color: #ADF;
+}
+span.hl-attention-old {
     color: darkblue;
     text-decoration: underline;
 }
+td.hl-attention {
+    background-color: #BDE;
+}
 
-.hl-special {
+span.hl-special {
     text-shadow: 0 0 8px #222;
 }
 
-.hl-new {
+span.hl-new {
     color: rgb(69, 177, 64);
     text-decoration: underline;
 }
-.hl-duplicate {
+span.hl-duplicate {
     color: rgb(62, 119, 60);
 }
-.hl-replaced {
+span.hl-replaced {
     color: rgb(163, 122, 61);
     text-decoration: underline;
 }

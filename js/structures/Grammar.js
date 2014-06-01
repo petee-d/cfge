@@ -175,6 +175,10 @@ Grammar.prototype.changed = function (noUpdate) {
                 that.rewriteGUIs(noUpdate);
             }
         }, 0);
+
+    // if it is the stored grammar that changed, purge stored LL and LR tables
+    if (this == Current.grammar)
+        purgeStoredParseTables();
     
 }
 

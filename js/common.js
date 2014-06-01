@@ -1,4 +1,4 @@
-﻿$Element = jQuery.fn;
+﻿$Element = jQuery.fn; // for code completion only
 
 function getAnyProperty(object) {
     /// <summary>return any property (not the key) of the object, or null</summary>

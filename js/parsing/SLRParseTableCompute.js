@@ -18,6 +18,7 @@ algorithm:
         processState
             closure
                 closureStep
+            addReductions
             createGotoSets
                 createGotoSetsForSymbol
 

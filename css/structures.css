@@ -321,6 +321,23 @@ div.rule_add > .add {
         opacity: 0.3;
     }
 
+    .parser-actions .interactive {
+        cursor: pointer;
+    }
+
+    .parser-actions > .syntax {
+        opacity: 0.5;
+    }
+
+    .parser-actions .action-error, .parser-actions div.add input {
+        color: darkred;
+        font-size: 60%;
+    }
+
+    .parser-conflict {
+        background-color: #F99;
+    }
+
 .action-reduce, .action-produce {
     font-size: 70%;
 }
@@ -403,39 +420,60 @@ div.rule_add > .add {
         margin: 2px 0 0 1px;
     }
 
+.structure.ParserInput {
+    display: block;
+}
 .parser-input {
 
 }
 
     .parser-input > div {
-        border: 2px solid transparent;
-        border-left-color: grey;
+        border-bottom: 6px solid #999;
+        border-left: 2px solid #BBB;
+        border-right: 2px solid #BBB;
+        border-top: 6px solid #999;
         display: inline-block;
         padding: 0 6px;
     }
 
-        .parser-input > div:first-child {
-            border-left-color: transparent;
-        }
-
     .parser-input > div.input-processed {
-        color: #555;
+        color: #777;
     }
 
     .parser-input > div.input-current {
         border-color: black;
-        border-left-color: black;
-    }
-
-    .parser-input > div.input-left {
     }
 
 .parser-stack {
 }
 
-    .parser-stack > div {
-        height: 32px;
+    .parser-stack > span {
+        border-left: 6px solid #999;
+        border-right: 6px solid #999;
+        display: block;
+        height: 20px;
+        min-width: 50px;
     }
+
+    .parser-stack > div {
+        border-bottom: 2px solid #BBB;
+        border-left: 6px solid #999;
+        border-right: 6px solid #999;
+        border-top: 2px solid #BBB;
+        height: 32px;
+        padding: 0 5px;
+        text-align: center;
+        min-width: 50px;
+    }
+        .parser-stack > div:first-of-type {
+            border-left: 6px solid black;
+            border-right: 6px solid black;
+            border-top: 0 solid transparent;
+            height: 32px;
+        }
+        .parser-stack > div:last-child {
+            border-bottom: 6px solid #999;
+        }
 
     .parser-stack .lr-state {
         font-size: 95%;

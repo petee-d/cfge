@@ -23,79 +23,40 @@ var Loader = function () {
             { "N": ["S", "A", "B", "C", "E"], "T": ["a", "b", "c"], "P": { "S": ["A B", "E E"], "A": ["a", "a a", "A C"], "B": ["A b A", "a b c B E"], "C": ["c"], "E": [Word.epsStr, "a S"] }, "S": "S" })
         .addExample("Greibach form", "starting nonterminal is epsilon-generating, situations like i < k, i = k and i > k all have to be dealt with",
             { "N": ["S", "A", "E"], "T": ["a", "b", "c"], "P": { "S": [Word.epsStr, "A A"], "A": ["A", "S", "a b E"], "E": ["E c"] }, "S": "S" })
-        .addExample("CYK - unambiguous grammar", "generates infix notation terms of basic arithmetics",
-            { "N": ["INIT", "T", "OP"], "T": ["n", "+", "*", "/", "-", "(", ")"], "P": { "INIT": ["n", "T OP T"], "OP": ["+", "*", "/", "-"], "T": ["n", "( T OP T )"] }, "S": "INIT" })
-        .addExample("CYK - ambiguous grammar", "demonstrates the Dangling else problem",
-            {"N":["S"],"T":["if","condition","then","statement","else"],"P":{"S":["statement","if condition then S","if condition then S else S"]},"S":"S"})
+        .addExample("parsing - arithmetics", "unambiguous, generates infix notation terms of basic arithmetics",
+            { "N": ["T", "OP"], "T": ["n", "(", ")", "+", "*", "/", "-"], "P": { "T": ["n", "( T OP T )"], "OP": ["+", "*", "/", "-"] }, "S": "T" })
+        .addExample("parsing - Dangling else", "ambiguous, demonstrates the Dangling else problem",
+            { "N": ["S"], "T": ["st", "if", "cond", "then", "else"], "P": { "S": ["st", "if cond then S", "if cond then S else S"] }, "S": "S" })
+        .addExample("parsing - assignment chain", "unambiguous, demonstrates chains of variable assignments, is LL and LALR, but not SLR",
+            { "N": ["S", "R", "E", "V"], "T": ["id", "num", "assign"], "P": { "S": ["id R"], "E": ["num", "id V R"], "R": ["V assign E", "eps"], "V": ["eps"] }, "S": "S" })
 
 
-    var hashGrammar; A = false;
+    var currentGrammar = false, hashGrammar;
     if (location.hash && (hashGrammar = location.hash.match(/#g~(.+)~g/)))
         try {
             var decompressed = LZString.decompressFromBase64(hashGrammar[1]);
             if (!decompressed) throw 0;
-            A = new Grammar(JSON.parse(decompressed))
+            currentGrammar = new Grammar(JSON.parse(decompressed))
         } catch (e) {
             setTimeout(function () { UserError(_("Grammar link representation is malformed!")); }, 100);
-            A = false;
+            currentGrammar = false;
         }
-
-    if (!A)
-        A = /* (A = new Grammar({
-            N: ['S', 'A/1', 'A/2', 'B', 'C', 'D'],
-            T: ['a', 'b'],
-            P: {
-                'S': ["a A/2 A/2", "b b A/1", "C", "S", "A/2 A/2"],
-                'A/1': ["C a", "a A/2", "S a A/2 b S"],
-                'A/2': ["a b", "A/2", "0", "D"],
-                'B': ["B", "a"],
-                'C': ["D a b C", "C b a", "a D"],
-                'D': ["C"]
-               }, 
-            S: 'S'
-        })) */
-        new Grammar({
-            N: ['S', 'A', 'B', 'R'],
-            T: ['a', 'b', 'c'],
-            P: {
-                'S': ["A R", "A B"],
-                'A': ["a"],
-                'B': ["b"],
-                'R': ["S B"]
-            },
-            S: 'S'
-        });
+    
+    if (!currentGrammar)
+        currentGrammar = new Grammar({ "N": ["S"], "T": ["a"], "P": { "S": ["a", "eps"] }, "S": "S" });
 
     window["Current"] = {
 
-        grammar: A,
+        grammar: currentGrammar,
         TextInput: { method: 1 },
         Automaton: { method: 'graphviz', direction: 'TB' }
 
     }
-    
 
 
-    // 
+    // handle algorithm implementations
 
-    $.each(Loader.algorithmList || [
-        ReducedForm,
-        EpsilonFreeForm,
-        ChainRuleFreeForm,
-        ChomskyForm,
-        StrictChomskyForm,
-        GreibachForm,
-        NoLeftRecursionForm,
-        LeftFactoredForm,
-
-        FirstFollowCompute,
-        SLRParseTableCompute,
-        CLRParseTableCompute,
-        LALRParseTableCompute,
-        LRParserAlgorithm,
-        LLParseTableCompute,
-        LLParserAlgorithm,
-    ], function () {
+    $.each(Loader.algorithmList, function () {
         switch (this.getType()) {
             case "FormConversion":
                 Evaluator.teach(this);

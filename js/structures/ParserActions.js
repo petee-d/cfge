@@ -7,25 +7,6 @@ function ParserActions(id, name) {
     this._disabled = {};
 }
 ParserActions.prototype = new SetStructure();
-ParserActions.prototype.toStructureInnerElement = function (brief, interactive) {
-    /// <param name="brief" type="Boolean">if true, only the list of items will be output</param>
-    /// <returns type="$Element" />
-    var that = this, list = $('<div></div>').addClass('parser-actions');
-    $.each(this._setFinalized, function () {
-        var itemObject = this, itemElement =
-            $('<div></div>').addClass(that.contains(this) ? null : 'disabled')
-            .append(this.toElement());
-        if (interactive)
-            itemElement.addClass('interactive').click(function () {
-                if ($(this).toggleClass('disabled').hasClass('disabled'))
-                    that.disableAction(itemObject);
-                else
-                    that.enableAction(itemObject);
-            });
-        list.append(itemElement);
-    });
-    return list;
-}
 ParserActions.prototype.contains = function (object) {
     /// <summary>find out if object is contained in this set and enabled</summary>
     /// <param name="object" type="Object">object to find</param>
@@ -88,6 +69,13 @@ ParserActions.prototype.createSetItemFromText = function (text, grammar) {
             return new LLActionProduce(grammar.tryGetRule(m[0], m[1]));
         default: MyError('invalid action string representation: ' + text);
     }
+}
+ParserActions.prototype.extraClass = function () {
+    /// <summary>what extra css class should a container of this structure add</summary>
+    /// <returns type="String" />
+    if (this.length() > 1)
+        return 'parser-conflict';
+    return this.highlight().addClass;
 }
 ParserActions.prototype.getType = function () {
     return "ParserActions";

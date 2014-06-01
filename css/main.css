@@ -31,7 +31,7 @@ body {
     overflow-y: scroll;
     position: absolute;
     top: 0;
-    width: 75%;
+    width: 100%;
 }
 
 #error_log, #error_log > div {
@@ -269,8 +269,8 @@ nav {
 
 #toolbox {
     bottom: 0;
+    left: 100%;
     position: absolute;
-    right: 0;
     top: 0;
     width: 25%;
     z-index: 5;

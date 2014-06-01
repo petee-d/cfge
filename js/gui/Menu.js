@@ -18,8 +18,9 @@
                 $('#tabs').height(oldTabElement.height());
                 tabSet.addClass('switching');
                 oldTabElement.fadeOut(200);
-                $(tab.getTabId() != "Algorithm" ? "#algorithm_toolbox" : "#other_toolbox")
-                .fadeOut(200);
+                var pageWidth = tab.getTabId() == "Algorithm" ? "75%" : "100%";
+                $('#page').css({ width: pageWidth });
+                $('#toolbox').animate({ left: pageWidth }, 250);
             }
         }
         this._activeTab = tab;
@@ -33,8 +34,6 @@
             }
         );
         newTabElement.fadeTo(250, 1);
-        $(tab.getTabId() == "Algorithm" ? "#algorithm_toolbox" : "#other_toolbox")
-        .fadeIn(250);
 
         this.minimizeMenu();
     },

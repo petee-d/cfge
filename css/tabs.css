@@ -1,8 +1,10 @@
 ﻿#TI_textarea {
-    width: 99%;
     display: block;
+    height: 200px;
+    margin: 5px 0;
+    min-height: 50px;
     resize: vertical;
-    min-height: 200px;
+    width: 99%;
 }
 
 
@@ -16,6 +18,21 @@
 #algorithm_container {
     margin: 0 0 0 0;
 }
+
+#algorithm_ParserInput {
+    padding: 5px 0;
+}
+    #algorithm_ParserInput input {
+        margin: 1px 20px;
+        width: 65%;
+        height: 25px;
+        vertical-align: 1px;
+        font-size: 25px;
+        font-style: italic;
+    }
+    #algorithm_ParserInput a.button {
+        float: right;
+    }
 
 
 

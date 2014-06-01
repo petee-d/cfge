@@ -274,10 +274,22 @@ LRAutomaton.prototype.toGraphvizGraph = function (id) {
 LRAutomaton.prototype.toStructureInnerElement = function () {
     /// <returns type="$Element" />
 
+    var $options = $('<div></div>').append(
+            $('#graph_option_renderer').clone().attr('id', false)
+                .change(function(){
+                    Current.Automaton.method = $('option:selected', this).val();
+                    Current.explorer.openActiveStep();
+                }).val(Current.Automaton.method),
+            $('#graph_option_direction').clone().attr('id', false)
+                .change(function(){
+                    Current.Automaton.direction = $('option:selected', this).val();
+                    Current.explorer.openActiveStep();
+                }).val(Current.Automaton.direction)
+        );
     switch (Current.Automaton.method) {
-        case 'graphviz':    return this.toGraphvizGraph();
-        case 'dagre':       return this.toDagreGraph();
-        default:            return $();
+        case 'graphviz':    return $options.add(this.toGraphvizGraph());
+        case 'dagre':       return $options.add(this.toDagreGraph());
+        default:            return $options;
     }
 }
 LRAutomaton.prototype.finalize = function () {

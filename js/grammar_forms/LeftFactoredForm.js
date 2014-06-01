@@ -35,9 +35,9 @@ LeftFactoredForm.main = function (c) {
 LeftFactoredForm.processNonterminal = function (c) {
     /// <summary>left factor the rules of one of the nonterminals</summary>
     /// <param name="c" type="LeftFactoredForm"></param>
-    c.myNameIs(_("left factor the productions of one of the nonterminals (if there are any alternatives of length at least 2)"));
-
     var left = c.d().LFac.left = c.d().LFac.queue.shift();
+    c.myNameIs(_("left factorize the productions of nonterminal %s", left.toString()));
+
     var longest = -1;
     c.g().forEachRuleWithLeft(left, function (_r, _l, right) {
         right.highlight(Highlight.ATT_TEMP);
@@ -80,17 +80,18 @@ LeftFactoredForm.factorAlternativesOfLength = function (c) {
 LeftFactoredForm.factorPrefix = function (c) {
     /// <summary>factor a prefix - create an auxiliary nonterminal that produces the leftovers</summary>
     /// <param name="c" type="LeftFactoredForm"></param>
-    c.myNameIs(_("factor a prefix - create an auxiliary nonterminal that produces the leftovers"));
 
     var left = c.d().LFac.left, len = c.d().LFac.currentLength,
         prefQueue = c.d().LFac.prefQueue, prefRuleRights = prefQueue.shift(),
     // add an auxiliary nonterminal ..
         auxN = c.g().taskNewNonterminal(left + '/' + len + '-' + (++c.d().LFac.prefCounter));
     // .. and a rule ..
+    var prefix = c.g().tryGetRule(left, prefRuleRights[0]).getRight().get().slice(0, len);
+    c.myNameIs(_("factorize the prefix %s - create an auxiliary nonterminal that produces the leftovers",
+        new Word(prefix, c.g()).toString()));
     c.g().taskAddRule(c.g().tryGetSymbol(left), // .. with the original left side ..
-        new Word($.merge( // .. and a concatenation of ..
-            c.g().tryGetRule(left, prefRuleRights[0]).getRight().get().slice(0, len), // .. the prefix ..
-            [auxN]), c.g())); // .. and the auxiliary nonterminal
+        // .. and a concatenation of the prefix and the auxiliary nonterminal ..
+        new Word($.merge(prefix, [auxN]), c.g()));
 
     // now add a rule for each leftover and remove the old ones
     $.each(prefRuleRights, function (_i, right) {

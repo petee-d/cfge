@@ -5,16 +5,19 @@ function ParserStack(id, name) {
     /// <param name="id" type="String">id for manipulation</param>
     /// <param name="name" type="String">name of this state, displayed to the user</param>
     this.initStructure(id, name);
+    this.priority(-10);
     this._stack = [];
 }
 ParserStack.prototype = new Structure();
 ParserStack.prototype.toStructureInnerElement = function () {
     /// <returns type="$Element" />
-    return $('<div class="parser-stack"></div>').append(
+    var list =
         $.map(this._stack, function (e) {
             return $('<div></div>').append(e.toElement());
-        })
-    );
+        }).reverse();
+    return $('<div class="parser-stack"></div>')
+           .append(list.length ? $('<span></span>') : $('<div></div>'))
+           .append(list);
 }
 ParserStack.prototype.toConcreteData = function () {
     /// <summary>get a stringifyable representation of this structure's data (finalized)</summary>
@@ -60,10 +63,11 @@ ParserStack.prototype.getType = function () {
 //  is as dumb as it looks
 
 function SymbolWrapperStructure(id, name, symbol) {
-    /// <summary>constructor of an LRItemSet, will be created with empty set of items</summary>
+    /// <summary>a simple structure wrapper for a symbol, so that it can be added to a stack</summary>
+    this.initStructure(id, name);
     this._symbol = symbol;
 }
-SymbolWrapperStructure.prototype = new SetStructure();
+SymbolWrapperStructure.prototype = new Structure();
 SymbolWrapperStructure.prototype.toElement = function () {
     /// <returns type="$Element" />
     return this._symbol.toElement();
@@ -93,8 +97,10 @@ function ParserInput(id, name, word, grammar) {
     /// <param name="word" type="Word">word over `grammar`'s symbols to parse</param>
     /// <param name="grammar" type="Grammar">grammar the input word could be created with</param>
     this.initStructure(id, name);
+    this.priority(-20);
     if (word && grammar) {
         this._w = word.get();
+        this._grammar = grammar;
         this._w.push(grammar.getEndMarker());
     } else this._w = [];
     this._pos = 0;
@@ -124,6 +130,10 @@ ParserInput.prototype.getLookahead = function () {
     /// <returns type="Terminal" />
     return this._w[this._pos];
 }
+ParserInput.prototype.getWord = function () {
+    /// <returns type="Word" />
+    return new Word(this._w.slice(0, -1), this._grammar);
+}
 ParserInput.prototype.next = function () {
     /// <summary>return the current symbol and move to the next one, it is an error to do so if the current symbol is the end-marker</summary>
     if (this._pos == this._w.length - 1) return MyError('parser input cannot go beyond the endmarker!');
@@ -142,6 +152,7 @@ function ParserOutput(id, name) {
     /// <param name="word" type="Word">word over `grammar`'s symbols to parse</param>
     /// <param name="grammar" type="Grammar">grammar the input word could be created with</param>
     this.initStructure(id, name);
+    this.priority(-10);
     this._rules = [];
     this._finished = false;
     this._traversalMethod = 'FINISH_FIRST!';

@@ -12,13 +12,24 @@ AlgorithmExplorer.prototype.c = function () {
     /// <returns type="AlgorithmController" />
     return this._c;
 }
-AlgorithmExplorer.prototype.start = function () {
+AlgorithmExplorer.prototype.start = function (invoker) {
+    /// <param name="invoker" type="Function">if passed, this it receives a callback to start the execution</param>
     /// <summary>execute the prepared algorithm</summary>
-    $('#algorithm_container').html('').add('#algorithm_right').hide();
     $('#algorithm_arrows li, #algorithm_save').off('click');
-    $('#algorithm_setup').show().find("#algorithm_progress").html('').text('...');
+    $('#algorithm_steps select').off();
+    $('#algorithm_toolbox').fadeOut(1000);
+    $('#algorithm_container').html('').hide();
 
-    this.c().execute();
+    if (invoker) {
+        var that = this;
+        invoker(function () {
+            $('#algorithm_setup').show().find("#algorithm_progress").html('').text('...');
+            that.c().execute();
+        });
+    } else {
+        $('#algorithm_setup').show().find("#algorithm_progress").html('').text('...');
+        this.c().execute();
+    }
 }
 
 AlgorithmExplorer.prototype.reportStep = function (numbering, name) {
@@ -45,10 +56,8 @@ AlgorithmExplorer.prototype.reportFinished = function () {
         var grammar = node.getFinalizedGrammar(),
             lrTable = node.structures().getTableStructure('LRTable'),
             llTable = node.structures().getTableStructure('LLTable');
-
-        Menu.lock(ParseTableInput);
-        Menu.lock(LRParserAlgorithm);
-        Menu.lock(LLParserAlgorithm);
+        
+        purgeStoredParseTables();
 
         if (lrTable || llTable) {
             Current.lrTable = lrTable;
@@ -79,6 +88,7 @@ AlgorithmExplorer.prototype.reportFinished = function () {
         that.openActiveStep();
     });
 
+    $('#algorithm_toolbox').stop(true).fadeIn(100);
     $('#algorithm_container').add('#algorithm_right').fadeIn(200);
     $('#algorithm_setup').fadeOut(150);
     this.openActiveStep();
@@ -91,9 +101,9 @@ AlgorithmExplorer.prototype.openActiveStep = function () {
 
     $('#algorithm_container').replaceWith(
         $('<div id="algorithm_container"></div>')
-            .append(a.grammar().toElement())
-            .append(a.structures().toElement())
+            .append(a.structures().plot(a.grammar()))
         );
+    $('#algorithm_setup, #algorithm_ParserInput').hide();
     $('#algorithm_name').html('');
     $('#algorithm_table').html('');
     $('#algorithm_steps select').val(a.numbering());
@@ -144,14 +154,67 @@ AlgorithmExplorer.prototype.goEnd = function () {
     this.openActiveStep();
 }
 
+AlgorithmExplorer.userParserInput = function (callback) {
+    /// <summary>attempt to store a valid user's input word and execute callback</summary>
+    /// <param name="callback" type="Function">function to call after getting valid input word from the user</param>
+    $('#algorithm_container').hide();
+    var originalWord = (Current.parserInput && Current.parserInput.getWord()) || new Word([], Current.grammar);
+    $('#algorithm_ParserInput input').val(originalWord.toString());
+    $('#PI_grammar').empty().append(Current.grammar.toElement());
+    $('#algorithm_ParserInput').show();
 
-function openAlgorithmExplorer(Algorithm) {
+    $('#algorithm_ParserInput .button').unbind('click').click(function () {
+        function getValidatedInputWord(reportErrors) {
+            var inputStr = $('#algorithm_ParserInput input').val(),
+                input = Word.tryParseString(inputStr, Current.grammar);
+            if (!input && !(function () {
+                /* a little hack requested by Zemco - if all terminals are represented by 1 character, I'll add spaces myself */
+                var shortTerminals = true;
+                Current.grammar.forEachTerminal(function (t) {
+                    if (t.toString().length > 1)
+                        return shortTerminals = false;
+                });
+                if (shortTerminals)
+                    input = Word.tryParseString(inputStr.replace(/(?:)/g, ' '), Current.grammar);
+                return input;
+            })())
+                return (reportErrors && NotificationBar.pop(_("The input is not a valid word! Separate some terminal symbols of the current grammar by spaces, or %s for empty word.", Word.epsStr)), false);
+
+            input = new Word(input, Current.grammar);
+            if (!input.isTerminal())
+                return (reportErrors && NotificationBar.pop(_("The input word is not terminal! Use only terminal symbols of the current grammar, or %s for empty word.", Word.epsStr)), false);
+
+            return input;
+        }
+
+        var input = getValidatedInputWord(true);
+        if (input) {
+            Current.parserInput = new ParserInput('ParserInput', _("Input"), input, Current.grammar);
+            callback();
+        }
+    });
+}
+
+
+function openAlgorithmExplorer(Algorithm, invoker) {
     /// <summary>user opened the algorithm tab for the Algorithm - open and recalc if necessary</summary>
     /// <param name="Algorithm" type="Function">an AlgorithmController subclass to open</param>
-    if (Current.explorer && Current.explorer.c().getName() == Algorithm.getName()
+    /// <param name="invoker" type="Function">if passed, this it receives a callback to start the execution</param>
+    if (Current.explorer && !invoker
+            && Current.explorer.c().getName() == Algorithm.getName()
             && Current.grammar.lastChange() == Current.explorer.c()._timestamp) {
         // nothing important changed since last time, so no recalc is needed
         Current.explorer.openActiveStep();
     } else
-        (Current.explorer = new AlgorithmExplorer(Algorithm)).start();
+        (Current.explorer = new AlgorithmExplorer(Algorithm)).start(invoker);
+}
+
+
+
+function purgeStoredParseTables() {
+    /// <summary>clear all the stored parse tables that were generated from the Current.grammar</summary>
+    Current.lrTable = Current.llTable = null;
+    Menu.lock(ParseTableInput);
+    Menu.lock(LRParserAlgorithm);
+    Menu.lock(LLParserAlgorithm);
 }

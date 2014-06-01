@@ -184,7 +184,7 @@ var CYKParseTree = {
                     Current.grammar.forEachTerminal(function (t) {
                         if (t.toString().length > 1)
                             return shortTerminals = false;
-                });
+                    });
                     if (shortTerminals)
                         input = Word.tryParseString($('#PT_input').val().replace(/(?:)/g, ' '), Current.grammar);
                     return input;

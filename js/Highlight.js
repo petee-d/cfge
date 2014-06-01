@@ -51,7 +51,7 @@ Highlight.SPECIAL_TEMP
 
 Highlight.get = function (highlightNumber) {
     /// <summary>get a highlight</summary>
-    return Highlight._list[highlightNumber];
+    return Highlight._list[highlightNumber] || Highlight.NONE;
 };
 
 Highlight.whichShouldStay = function (original, intended) {

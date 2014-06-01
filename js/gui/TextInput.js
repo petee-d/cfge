@@ -34,7 +34,7 @@ var TextInput = {
                         } catch (e) { o = UserError(_("This is not valid JSON!") + " (" + e + ")"); } break;
             }
             if (o) {
-                Current.grammar = Grammar.tryCreate(o) || Current.grammar;
+                (Current.grammar = Grammar.tryCreate(o) || Current.grammar).changed();
                 OriginalGrammar.update();
                 Evaluator.update(Current.grammar);
             }

@@ -9,6 +9,7 @@ Structure.prototype.initStructure = function (id, name) {
     this._id = id;
     this._name = name;
     this._highlight = Highlight.NONE;
+    this._priority = 1;
 }
 Structure.prototype.id = function () {
     /// <returns type="String" />
@@ -29,9 +30,30 @@ Structure.prototype.name = function (newName) {
         return this;
     } else return this._name;
 }
+Structure.prototype.priority = function (newPriority) {
+    /// <signature>
+    /// <summary>get the priority of this structure</summary>
+    /// <returns type="Number" />
+    /// </signature>
+    /// <signature>
+    /// <summary>set the priority for this structure</summary>
+    /// <param name="newPriority" type="Number">the lower, the higher is the structure displayed, grammar is 0</param>
+    /// <returns type="Structure" />
+    /// </signature>
+    if (newPriority) {
+        this._priority = newPriority || 0;
+        return this;
+    } else return this._priority;
+}
 Structure.prototype.toData = function () {
     /// <summary>get a stringifyable representation of this object</summary>
-    return $.extend({ id: this._id, name: this._name, type: this.getType() }, this.toConcreteData());
+    return $.extend({
+        id: this._id,
+        name: this._name,
+        type: this.getType(),
+        highlight: this._highlight.value,
+        priority: this._priority
+    }, this.toConcreteData());
 }
 Structure.prototype.fillStructureData = function (data, grammar) {
     /// <param name="data" type="Object">data for this object</param>
@@ -43,18 +65,21 @@ Structure.prototype.toElement = function (interactive) {
     /// <summary>get HTML element displaying this structure</summary>
     /// <returns type="$Element" />
 
+    var $structure;
     if (this.name() && !(this instanceof TableStructure)) {
-        var h = $('#set_structure_template > .structure').clone();
-        h.find('.set_box').remove();
-        if (this.name()) h.find('.set_mapping').prepend(Structure.makeHeader(this.name()));
-        else h.find('.set_mapping').remove();
-        h.find('> div > div').append(this.toStructureInnerElement(interactive));
-        return h;
+        var $structure = $('#set_structure_template > .structure').clone();
+        $structure.find('.set_box').remove();
+        if (this.name()) $structure.find('.set_mapping').prepend(Structure.makeHeader(this.name()));
+        else $structure.find('.set_mapping').remove();
+        $structure.find('> div > div').append(this.toStructureInnerElement(interactive));
     } else {
-        return $('<div class="structure"></div>').append(this.toStructureInnerElement(interactive));
+        $structure = $('<div class="structure"></div>').append(this.toStructureInnerElement(interactive));
     }
+    $structure.addClass(this.getType());
+    return $structure;
 }
 Structure.prototype.finalize = function () {
+    this.highlight(this.highlight().decay());
 }
 Structure.prototype.highlight = function (arg) {
     /// <summary>get (no arguments) or set the highlight</summary>
@@ -66,12 +91,14 @@ Structure.prototype.highlight = function (arg) {
 Structure.fromData = function (data, grammar) {
     /// <summary>create an instance of the correct Structure subclass from data, using the given grammar</summary>
     /// <returns type="Structure" />
-    var x;
+    var structure;
     if (window[data.type])
-        x = new window[data.type](data.id, data.name);
+        structure = new window[data.type](data.id, data.name);
     else return MyError("bad Structure type");
-    x.fillStructureData(data, grammar);
-    return x;
+    structure._highlight = Highlight.get(data.highlight);
+    structure.priority(data.priority);
+    structure.fillStructureData(data, grammar);
+    return structure;
 }
 Structure.makeHeader = function (name) {
     if (!name) return $();
@@ -173,6 +200,7 @@ SetStructure.prototype.getAnyItem = function () {
 }
 SetStructure.prototype.finalize = function () {
     this._set = $.extend({}, this._setFinalized);
+    this.highlight(this.highlight().decay());
     return this;
 }
 
@@ -246,7 +274,9 @@ TableStructure.prototype.toStructureInnerElement = function (interactive) {
                 return $('<tr>').append(
                     [$('<th>').append(Structure.makeHeader(rowname))].concat(
                         $.map(that._columns, function (colname, colId) {
-                            return $('<td>').append(that._table[rowId][colId].toStructureInnerElement(true, interactive));
+                            var cell = that._table[rowId][colId];
+                            return $('<td>').append(cell.toStructureInnerElement(true, interactive))
+                                   .addClass((cell.extraClass && cell.extraClass()) || null);
                         }))   
                 );
             })
@@ -333,6 +363,7 @@ TableStructure.prototype.getType = function () {
     return "TableStructure";
 }
 TableStructure.prototype.finalize = function () {
+    this.highlight(this.highlight().decay());
     for (var r in this._table) {
         r = this._table[r];
         for (var c in r)
@@ -420,14 +451,23 @@ Structures.prototype.toData = function () {
         return e.toData();
     });
 }
-Structures.prototype.toElement = function () {
-    /// <summary>get a HTML representation of all the structures</summary>
+Structures.prototype.plot = function (grammar) {
+    /// <summary>get a HTML representation of all the structures plus the grammar, ordered by priority</summary>
     /// <returns type="$Element" />
-    var nonEmpty = false;
-    return $('<span class="structures"></div>').append($.map(this._list, function (e) {
-        nonEmpty = true;
-        return e.toElement();
-    }));//.add(nonEmpty ? $('<hr />') : null);
+    var list = $.map(this._list, function (e) {
+        return {
+            priority: e.priority(),
+            $element: e.toElement()
+        };
+    });
+    list.push({
+        priority: 0,
+        $element: grammar.toElement()
+    });
+    return $('<span class="structures"></div>').append(
+            list.sort(function (a, b) { return a.priority - b.priority; })
+            .map(function (o) { return o.$element; })
+        );
 }
 Structures.prototype.finalize = function () {
     $.each(this._list, function (i, structure) {
@@ -465,14 +505,13 @@ Structures.prototype.getParserStack = function (id) {
     /// <returns type="ParserStack" />
     return this._list[id] || null;
 }
-Structures.prototype.newParserInput = function (id, name, word, grammar) {
-    /// <summary>add a new parser stack, with given id (internal) and name (user)</summary>
-    /// <param name="id" type="String">internal identificator</param>
-    /// <param name="name" type="String">name displayed to user, should look like a symbol</param>
-    /// <param name="word" type="Word">word over `grammar`'s symbols to parse</param>
-    /// <param name="grammar" type="Grammar">grammar the input word could be created with</param>
-    /// <returns type="ParserInput" />
-    return this._list[id] = new ParserInput(id, name, word, grammar);
+Structures.prototype.adoptParserInput = function (id) {
+    /// <summary>get the currently saved parser input and maintain it by this object under the given id</summary>
+    /// <param name="id" type="String">internal id of this structure</param>
+    /// <returns type="TableStructure" />
+    var input = Current.parserInput || MyError('there is no stored parser input!');
+    input._id = id;
+    return this._list[id] = input;
 }
 Structures.prototype.getParserInput = function (id) {
     /// <summary>retrieve stored parser stack with given id</summary>

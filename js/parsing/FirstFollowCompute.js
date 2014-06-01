@@ -22,6 +22,8 @@ algorithm:
         followFromRules
 	        (repeat) nextRule4Follow
 
+    cleanUp
+
 */
 
 FirstFollowCompute.main = function (c) {

@@ -5,29 +5,37 @@ setupAlgorithmImplementation(
     {
         id: "LLParserAlgorithm",
         name: _("simulate LL parser"),
-        type: "ParsingAlgorithm"
+        type: "ParsingAlgorithm",
+        userParserInput: true
     }
 );
 
 /* 
 algorithm:
 
-    initItems
+    init
+
+    parse
+        (repeat) parseStep
+            actionConsumeTerminal
+            /
+            actionProducePopStack
+            actionProducePushRight
+
+    result
 
 */
 
 LLParserAlgorithm.main = function (c) {
     /// <summary>parse the input word using the active LL parsing table</summary>
     /// <param name="c" type="LLParserAlgorithm"></param>
+    c.myNameIs(_("parse the input word using LL"));
 
-    var inputStr = prompt("[TODO: less ugly and validated]\ninput word:", 'a a a b b b'),
-        input = new Word(inputStr, c.g());
+    // get the input
+    var input = c.s().adoptParserInput('LLParserInput');
 
-    c.myNameIs(_("parse the input word %s using the active LL parsing table",
-        makeMath(input.toString())
-        ));
-
-    c.s().newParserInput('LLParserInput', _("Input"), input, c.g());
+    // retrieve the parser table
+    c.s().adoptCurrentLLParserTable('LLTable').priority(-1);
 
     c.task(LLParserAlgorithm.init)
      .task(LLParserAlgorithm.parse)
@@ -40,11 +48,8 @@ LLParserAlgorithm.init = function (c) {
     c.myNameIs(_("prepare the initial stack state"));
 
     // create a stack
-    var stack = c.s().newParserStack('LLParserStack', _("Stack"));
+    var stack = c.s().newParserStack('LLParserStack');
     stack.push(c.g().getStarting());
-
-    // retrieve the parser table
-    c.s().adoptCurrentLLParserTable('LLTable');
 
     // prepare the output
     c.s().newParserOutput('LLParserOutput');
@@ -101,6 +106,7 @@ LLParserAlgorithm.parseStep = function (c) {
     } else {
         var actions = table.get(currentTop, lookahead),
             action = actions.getAnyItem();
+        actions.highlight(Highlight.ATT_TEMP);
 
         if (actions.length() < 1) {
             c.myNameIs(_("Parsing error") + ": " + _("no parser action defined"));
@@ -119,6 +125,7 @@ LLParserAlgorithm.parseStep = function (c) {
                 makeMath(currentTop), makeMath(lookahead),
                 action.rule.toUserString()
                 ));
+            c.d().LLParser.actions = actions;
             c.d().LLParser.produceAction = action;
             c.task(LLParserAlgorithm.actionProducePopStack)
              .task(LLParserAlgorithm.actionProducePushRight);
@@ -151,6 +158,8 @@ LLParserAlgorithm.actionProducePopStack = function (c) {
         makeMath(rule.getLeft())
         ));
 
+    c.d().LLParser.actions.highlight(Highlight.ATT_TEMP);
+
     output.emitRule(rule);
     stack.popN(1);
 }
@@ -165,6 +174,8 @@ LLParserAlgorithm.actionProducePushRight = function (c) {
         makeMath(rule.getRight())
         ));
 
+    c.d().LLParser.actions.highlight(Highlight.ATT_TEMP);
+
     $.each(rule.getRight().get().reverse(), function (i, symbol) {
         stack.push(symbol);
     });
@@ -175,6 +186,7 @@ LLParserAlgorithm.result = function (c) {
     /// <summary>done, clean up</summary>
     /// <param name="c" type="LLParserAlgorithm"></param>
 
+    c.s().remove('LLParserStack');
     if (c.d().LLParser.result == "accepted") {
         c.myNameIs(_("parsing successful"));
 

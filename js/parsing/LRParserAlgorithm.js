@@ -5,27 +5,39 @@ setupAlgorithmImplementation(
     {
         id: "LRParserAlgorithm",
         name: _("simulate LR parser"),
-        type: "ParsingAlgorithm"
+        type: "ParsingAlgorithm",
+        userParserInput: true
     }
 );
 
 /* 
 algorithm:
 
-    initItems
+    init
+
+    parse
+        (repeat) parseStep
+            actionShiftPushSymbol
+            actionShiftGoto
+            /
+            actionReducePopStack
+            actionReducePushSymbol
+            actionReduceGoto
+
+    result
 
 */
 
 LRParserAlgorithm.main = function (c) {
     /// <summary>parse the input word</summary>
     /// <param name="c" type="LRParserAlgorithm"></param>
+    c.myNameIs(_("parse the input word using LR"));
 
-    var inputStr = prompt("[TODO: less ugly and validated]\ninput word:", 'a a a b b b'),
-        input = new Word(inputStr, c.g());
+    // get user input
+    var input = c.s().adoptParserInput('LRParserInput');
 
-    c.myNameIs(_("parse the input word %s", makeMath(input.toString())));
-
-    c.s().newParserInput('LRParserInput', _("Input"), input, c.g());
+    // retrieve the LR parser table, type doesn't matter
+    c.s().adoptCurrentLRParserTable('LRTable').priority(-1);
 
     c.task(LRParserAlgorithm.init)
      .task(LRParserAlgorithm.parse)
@@ -38,15 +50,12 @@ LRParserAlgorithm.init = function (c) {
     c.myNameIs(_("prepare the initial stack state"));
     
     // create a supplementary (and useless) stack for symbols
-    var symbolStack = c.s().newParserStack('LRParserSymbolStack', _("Stack"));
-    symbolStack.push(new LRState('', '', true));
+    var symbolStack = c.s().newParserStack('LRParserSymbolStack');
+    symbolStack.push(new LRState('', '-', true));
 
     // create a stack for states
     var stack = c.s().newParserStack('LRParserStack');
     stack.push(new LRState('0', '0', true));
-
-    // retrieve the LR parser table, type doesn't matter
-    c.s().adoptCurrentLRParserTable('LRTable');
 
     // prepare the output
     c.s().newParserOutput('LRParserOutput');
@@ -78,9 +87,10 @@ LRParserAlgorithm.parseStep = function (c) {
         input = c.s().getParserInput('LRParserInput');
     
     var currentState = stack.peekTop(), lookahead = input.getLookahead(),
-        actions = table.get(currentState.id(), lookahead.toString()),
+        actions = c.d().LRParser.actions = table.get(currentState.id(), lookahead.toString()),
         action = actions.getAnyItem(),
         desc = _("ACTION[%s, %s]", currentState.id(), makeMath(lookahead.toString())) + " - ";
+    actions.highlight(Highlight.ATT_TEMP);
 
     if (actions.length() < 1) {
         c.myNameIs(desc + _("Parsing error") + ": " + _("no parser action defined"));
@@ -123,6 +133,7 @@ LRParserAlgorithm.actionShiftPushSymbol = function (c) {
 
     var symbolStack = c.s().getParserStack('LRParserSymbolStack'),
         input = c.s().getParserInput('LRParserInput');
+    c.d().LRParser.actions.highlight(Highlight.ATT_TEMP);
 
     var terminal = input.next();
     symbolStack.push(terminal);
@@ -136,6 +147,7 @@ LRParserAlgorithm.actionShiftGoto = function (c) {
         table = c.s().getTableStructure('LRTable'),
         gotoID = c.d().LRParser.shiftAction.state,
         goto = new LRState(gotoID, gotoID, true);
+    c.d().LRParser.actions.highlight(Highlight.ATT_TEMP);
     c.myNameIs(_("go to state %s (push it on the stack)", gotoID));
 
     stack.push(goto);
@@ -149,6 +161,7 @@ LRParserAlgorithm.actionReducePopStack = function (c) {
         symbolStack = c.s().getParserStack('LRParserSymbolStack'),
         rule = c.d().LRParser.reduceAction.rule,
         itemsToPop = rule.getRight().length();
+    c.d().LRParser.actions.highlight(Highlight.ATT_TEMP);
     c.myNameIs(_("pop last %s items from the stack (two times the length of the rule right side)", 2 * itemsToPop));
 
     stack.popN(itemsToPop);
@@ -163,6 +176,7 @@ LRParserAlgorithm.actionReducePushSymbol = function (c) {
         symbolStack = c.s().getParserStack('LRParserSymbolStack'),
         rule = c.d().LRParser.reduceAction.rule,
         currentStateID = c.d().LRParser.currentStateID = stack.peekTop().id();
+    c.d().LRParser.actions.highlight(Highlight.ATT_TEMP);
     c.myNameIs(_("note current state %s and push the rule left side nonterminal (%s) on the stack",
         currentStateID, makeMath(rule.getLeft().toString())));
 
@@ -180,6 +194,7 @@ LRParserAlgorithm.actionReduceGoto = function (c) {
         oldStateID = c.d().LRParser.currentStateID,
         desc = _("find GOTO[%s, %s] (using the noted most recent state and rule left side nonterminal)",
             oldStateID, rule.getLeft().toString());
+    c.d().LRParser.actions.highlight(Highlight.ATT_TEMP);
 
     var gotoEntries = table.get(oldStateID, rule.getLeft().toString()),
         gotoEntry = gotoEntries.getAnyItem();
@@ -205,6 +220,7 @@ LRParserAlgorithm.result = function (c) {
     /// <summary>done, clean up</summary>
     /// <param name="c" type="LRParserAlgorithm"></param>
 
+    c.s().remove('LRParserStack');
     if (c.d().LRParser.result == "accepted") {
         c.myNameIs(_("parsing successful"));
 
