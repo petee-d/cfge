@@ -24,11 +24,12 @@ Hosted at:
 
 #### Thesis
 The bachelor's thesis this project is a part of can be found at:
-https://github.com/petee-d/cfge/raw/master/thesis.pdf
+
+http://micro.dcs.fmph.uniba.sk/cfge/thesis.pdf
 
 The thesis includes:
 * a usage example with pictures
 * normal form definitions and short algorithm specifics
-* explanation of the project's framework for visualization algorithms on context-free grammars
- * provides information to aid with implementing more algorithms for the project
+* an introduction to the project's framework for visualizing algorithms on context-free grammars
+ * can aid implementing more algorithms for the project
 * project backgrounds - other projects, technologies and goals
