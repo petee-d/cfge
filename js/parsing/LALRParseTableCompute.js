@@ -70,14 +70,14 @@ LALRParseTableCompute.prototype.fixParseTableStateNames = function (c, oldID, ne
         actions.forEachItem(function (action) {
             if (action instanceof LRGotoEntry && action.state == oldID) {
                 actions.remove(action);
-                actions.add(new LRGotoEntry(newID))
+                actions.add(new LRGotoEntry(newID));
             }
             if (action instanceof LRActionShift && action.state == oldID) {
                 actions.remove(action);
-                actions.add(new LRActionShift(newID))
+                actions.add(new LRActionShift(newID));
             }
         });
-    });
+    }).finalize();
 }
 
 LALRParseTableCompute.mergeGroupOfState = function (c) {
