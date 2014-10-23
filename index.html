@@ -4,66 +4,66 @@
     <title>Context-Free Grammar Explorer</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 
-    <!-- ?24 is used to enforce flushing cache on new versions -->
+    <!-- ?25 is used to enforce flushing cache on new versions -->
 
-    <link rel="stylesheet" href="css/main.css?24" />
-    <link rel="stylesheet" href="css/symbols.css?24" />
-    <link rel="stylesheet" href="css/structures.css?24" />
-    <link rel="stylesheet" href="css/tabs.css?24" />
+    <link rel="stylesheet" href="css/main.css?25" />
+    <link rel="stylesheet" href="css/symbols.css?25" />
+    <link rel="stylesheet" href="css/structures.css?25" />
+    <link rel="stylesheet" href="css/tabs.css?25" />
     
-    <script src="js/common.js?24"></script>
-    <script src="js/MyError.js?24"></script>
-    <script src="js/Loader.js?24"></script>
-    <script src="js/Highlight.js?24"></script>
+    <script src="js/common.js?25"></script>
+    <script src="js/MyError.js?25"></script>
+    <script src="js/Loader.js?25"></script>
+    <script src="js/Highlight.js?25"></script>
 
-    <script src="js/external/plugins.js?24"></script>
+    <script src="js/external/plugins.js?25"></script>
     <script src="js/external/lz-string-1.3.3.js"></script>
     <script src="js/external/d3.v3.min.js"></script>
     <script src="js/external/dagre-d3.min.js"></script>
     <script src="js/external/viz.js"></script>
 
-    <script src="js/structures/Symbol.js?24"></script>
-    <script src="js/structures/Word.js?24"></script>
-    <script src="js/structures/Rule.js?24"></script>
-    <script src="js/structures/Grammar.js?24"></script>
-    <script src="js/structures/ConversionGrammar.js?24"></script>
+    <script src="js/structures/Symbol.js?25"></script>
+    <script src="js/structures/Word.js?25"></script>
+    <script src="js/structures/Rule.js?25"></script>
+    <script src="js/structures/Grammar.js?25"></script>
+    <script src="js/structures/ConversionGrammar.js?25"></script>
     
-    <script src="js/structures/Structures.js?24"></script>
-    <script src="js/structures/LRItem.js?24"></script>
-    <script src="js/structures/LRState.js?24"></script>
-    <script src="js/structures/LRAutomaton.js?24"></script>
-    <script src="js/structures/ParserActions.js?24"></script>
-    <script src="js/structures/ParserStructures.js?24"></script>
+    <script src="js/structures/Structures.js?25"></script>
+    <script src="js/structures/LRItem.js?25"></script>
+    <script src="js/structures/LRState.js?25"></script>
+    <script src="js/structures/LRAutomaton.js?25"></script>
+    <script src="js/structures/ParserActions.js?25"></script>
+    <script src="js/structures/ParserStructures.js?25"></script>
 
-    <script src="js/algorithm_framework/AlgorithmController.js?24"></script>
-    <script src="js/algorithm_framework/AlgorithmExplorer.js?24"></script>
+    <script src="js/algorithm_framework/AlgorithmController.js?25"></script>
+    <script src="js/algorithm_framework/AlgorithmExplorer.js?25"></script>
 
-    <script src="js/grammar_forms/ReducedForm.js?24"></script>
-    <script src="js/grammar_forms/EpsilonFreeForm.js?24"></script>
-    <script src="js/grammar_forms/ChainRuleFreeForm.js?24"></script>
-    <script src="js/grammar_forms/ChomskyForm.js?24"></script>
-    <script src="js/grammar_forms/StrictChomskyForm.js?24"></script>
-    <script src="js/grammar_forms/NoLeftRecursionForm.js?24"></script>
-    <script src="js/grammar_forms/GreibachForm.js?24"></script>
-    <script src="js/grammar_forms/LeftFactoredForm.js?24"></script>
-    <script src="js/grammar_forms/FrameworkDemoForm.js?24"></script>
+    <script src="js/grammar_forms/ReducedForm.js?25"></script>
+    <script src="js/grammar_forms/EpsilonFreeForm.js?25"></script>
+    <script src="js/grammar_forms/ChainRuleFreeForm.js?25"></script>
+    <script src="js/grammar_forms/ChomskyForm.js?25"></script>
+    <script src="js/grammar_forms/StrictChomskyForm.js?25"></script>
+    <script src="js/grammar_forms/NoLeftRecursionForm.js?25"></script>
+    <script src="js/grammar_forms/GreibachForm.js?25"></script>
+    <script src="js/grammar_forms/LeftFactoredForm.js?25"></script>
+    <script src="js/grammar_forms/FrameworkDemoForm.js?25"></script>
     
-    <script src="js/parsing/CYK.js?24"></script>
-    <script src="js/parsing/CYKParseTree.js?24"></script>
-    <script src="js/parsing/FirstFollowCompute.js?24"></script>
-    <script src="js/parsing/SLRParseTableCompute.js?24"></script>
-    <script src="js/parsing/CLRParseTableCompute.js?24"></script>
-    <script src="js/parsing/LALRParseTableCompute.js?24"></script>
-    <script src="js/parsing/LRParserAlgorithm.js?24"></script>
-    <script src="js/parsing/LLParseTableCompute.js?24"></script>
-    <script src="js/parsing/LLParserAlgorithm.js?24"></script>
+    <script src="js/parsing/CYK.js?25"></script>
+    <script src="js/parsing/CYKParseTree.js?25"></script>
+    <script src="js/parsing/FirstFollowCompute.js?25"></script>
+    <script src="js/parsing/SLRParseTableCompute.js?25"></script>
+    <script src="js/parsing/CLRParseTableCompute.js?25"></script>
+    <script src="js/parsing/LALRParseTableCompute.js?25"></script>
+    <script src="js/parsing/LRParserAlgorithm.js?25"></script>
+    <script src="js/parsing/LLParseTableCompute.js?25"></script>
+    <script src="js/parsing/LLParserAlgorithm.js?25"></script>
     
-    <script src="js/gui/visualComponents.js?24"></script>
-    <script src="js/gui/Menu.js?24"></script>
-    <script src="js/gui/MainTab.js?24"></script>
-    <script src="js/gui/RichInput.js?24"></script>
-    <script src="js/gui/TextInput.js?24"></script>
-    <script src="js/gui/ParseTableInput.js?24"></script>
+    <script src="js/gui/visualComponents.js?25"></script>
+    <script src="js/gui/Menu.js?25"></script>
+    <script src="js/gui/MainTab.js?25"></script>
+    <script src="js/gui/RichInput.js?25"></script>
+    <script src="js/gui/TextInput.js?25"></script>
+    <script src="js/gui/ParseTableInput.js?25"></script>
 
     <script type="text/javascript">
 

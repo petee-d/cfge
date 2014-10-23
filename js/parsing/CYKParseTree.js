@@ -15,7 +15,7 @@ PTNode.prototype.toElement = function () {
 }
 PTNode.colorize = function (e, i) {
     var c = 150 + Math.round(85 / Math.pow(Math.abs(i) || 1, 0.3));
-    return $(e).attr('style', "border-color: rgb(" + (c - 10) + "," + (c - 10) + "," + (c - 10) + "); " + (
+    return $(e).attr('style', "border-color: black; " + (
         "background: rgb(47,47,47); /* Old browsers */ " +
         "background: -moz-linear-gradient(top, rgb(47,47,47) 0%, rgb(220,230,242) 100%); /* FF3.6+ */ " +
         "background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(47,47,47)), color-stop(100%,rgb(220,230,242))); /* Chrome,Safari4+ */ " +

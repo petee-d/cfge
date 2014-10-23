@@ -143,7 +143,7 @@ SLRParseTableCompute.closureStep = function (c) {
     while (closure.queue.length) {
         var item = closure.queue.shift(),
             next = item.getSymbolAfterDot();
-        if (next && next.isNonterminal() && !nonTermSet.contains(next)) {
+        if (next && next.isNonterminal()) {
             nonTermSet.add(next);
             c.g().forEachRuleWithLeft(next, function (rule) {
                 var newItems = c.createItemsByClosureExpansion(c, item, rule);

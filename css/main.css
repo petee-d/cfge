@@ -414,7 +414,16 @@ nav {
     #algorithm_steps > select {
         height: 100%;
         width: 100%;
+        font-size: 0px;
     }
+
+        #algorithm_steps > select > option {
+            white-space: normal;
+        }
+            
+            #algorithm_steps > select > option:first-line {
+                font-size: 13px;
+            }
 
 
 /* ############### *
